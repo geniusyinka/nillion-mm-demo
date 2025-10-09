@@ -1,42 +1,78 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
+main {
   padding: 2rem;
-  text-align: center;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.grid-container {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 2rem;
+  text-align: left;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.panel {
+  border: 1px solid #444;
+  padding: 1rem;
+  height: calc(90vh - 4rem);
+  display: flex;
+  flex-direction: column;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.log-panel pre {
+  background-color: #111;
+  border: 1px solid #333;
+  padding: 1rem;
+  flex-grow: 1;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 0.9em;
 }
 
-.card {
-  padding: 2em;
+.controls-panel h2, .log-panel h2 {
+  margin-top: 0;
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.5rem;
 }
 
-.read-the-docs {
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.button-group h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1em;
   color: #888;
+  text-transform: uppercase;
+}
+
+button {
+  width: 100%;
+  border-radius: 0;
+  border: 1px solid #555;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  text-align: left;
+}
+
+button:hover {
+  border-color: #777;
+  background-color: #333;
+}
+
+button:disabled {
+  border-color: #333;
+  background-color: #222;
+  color: #555;
+  cursor: not-allowed;
 }
