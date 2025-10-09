@@ -1,24 +1,54 @@
-:root {
-  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-  line-height: 1.5;
-  font-weight: 400;
+@import "tailwindcss";
 
-  color-scheme: dark;
-  color: #e0e0e0;
-  background-color: #1a1a1a;
+@theme {
+  --font-family-sans: "JetBrains Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Semantic color tokens - Catppuccin Mocha theme */
+  --color-background: #1e1e2e;
+  --color-foreground: #cdd6f4;
+  --color-border: #313244;
+  --color-border-hover: #b4befe;
+  --color-panel-bg: #181825;
+  --color-button-bg: #313244;
+  --color-button-hover: #45475a;
+  --color-button-disabled-bg: #181825;
+  --color-button-disabled-text: #6c7086;
+  --color-code-bg: #11111b;
+  --color-log-bg: #181825;
+  --color-heading-secondary: #a6adc8;
+  --color-accent: #b4befe;
+  --color-primary: #89b4fa;
+  --color-success: #a6e3a1;
+  --color-warning: #f9e2af;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  font-family: var(--font-family-sans);
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--color-foreground);
+  background-color: var(--color-background);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3 {
-  letter-spacing: 1px;
+h1,
+h2,
+h3 {
+  letter-spacing: 0.05em;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
 }
