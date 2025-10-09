@@ -1,0 +1,93 @@
+services:
+  nilchain:
+    image: ghcr.io/nillionnetwork/nilchain-devnet:main
+    ports:
+      - "40648:26648"
+
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "40432:5432"
+
+  proxy:
+    image: caddy:2
+    depends_on:
+      - nilchain
+    ports:
+      - "40923:80"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+    command: caddy run --config /etc/caddy/Caddyfile
+
+  nilauth:
+    image: public.ecr.aws/k5d9x2g2/nilauth:main
+    depends_on:
+      - postgres
+      - nilchain
+      - proxy
+    volumes:
+      - ./nilauth/config.yaml:/opt/config.yaml
+    command: [ "--config-file", "/opt/config.yaml" ]
+    ports:
+      - "40921:8080"
+
+  nildb-1:
+    image: public.ecr.aws/k5d9x2g2/nildb-api:main
+    depends_on:
+      - mongo
+    ports:
+      - "40081:8080"
+    environment:
+      - APP_DB_NAME_BASE=nildb-1
+      - APP_DB_URI=mongodb://mongo:27017
+      - APP_ENABLED_FEATURES=openapi,metrics,migrations
+      - APP_LOG_LEVEL=debug
+      - APP_METRICS_PORT=9091
+      - APP_NILAUTH_BASE_URL=http://nilauth:8080
+      - APP_NILAUTH_PUBLIC_KEY=03520e70bd97a5fa6d70c614d50ee47bf445ae0b0941a1d61ddd5afa022b97ab14
+      - APP_NODE_PUBLIC_ENDPOINT=http://127.0.0.1:40081
+      - APP_NODE_SECRET_KEY=6cab2d10ac21886404eca7cbd40f1777071a243177eae464042885b391412b4e
+      - APP_PORT=8080
+
+  nildb-2:
+    image: public.ecr.aws/k5d9x2g2/nildb-api:main
+    depends_on:
+      - mongo
+    ports:
+      - "40082:8080"
+    environment:
+      - APP_DB_NAME_BASE=nildb-2
+      - APP_DB_URI=mongodb://mongo:27017
+      - APP_ENABLED_FEATURES=openapi,metrics,migrations
+      - APP_LOG_LEVEL=debug
+      - APP_METRICS_PORT=9091
+      - APP_NILAUTH_BASE_URL=http://nilauth:8080
+      - APP_NILAUTH_PUBLIC_KEY=03520e70bd97a5fa6d70c614d50ee47bf445ae0b0941a1d61ddd5afa022b97ab14
+      - APP_NODE_PUBLIC_ENDPOINT=http://127.0.0.1:40082
+      - APP_NODE_SECRET_KEY=8b9d205ac5e7aed9c06e9dd3e1271680bc47895a618cefc820939d1c995bde48
+      - APP_PORT=8080
+
+  nildb-3:
+    image: public.ecr.aws/k5d9x2g2/nildb-api:main
+    depends_on:
+      - mongo
+    ports:
+      - "40083:8080"
+    environment:
+      - APP_DB_NAME_BASE=nildb-3
+      - APP_DB_URI=mongodb://mongo:27017
+      - APP_ENABLED_FEATURES=openapi,metrics,migrations
+      - APP_LOG_LEVEL=debug
+      - APP_METRICS_PORT=9091
+      - APP_NILAUTH_BASE_URL=http://nilauth:8080
+      - APP_NILAUTH_PUBLIC_KEY=03520e70bd97a5fa6d70c614d50ee47bf445ae0b0941a1d61ddd5afa022b97ab14
+      - APP_NODE_PUBLIC_ENDPOINT=http://127.0.0.1:40083
+      - APP_NODE_SECRET_KEY=18e269f30255aee1a501a7c54de6edd336d15ff4fce835f50ddb1d00d72a4ec7
+      - APP_PORT=8080
+
+  mongo:
+    image: mongo:8
+    ports:
+      - "40017:27017"
