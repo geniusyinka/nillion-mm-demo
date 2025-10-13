@@ -9,6 +9,7 @@ export const useDeleteCollectionMutation = (
   const { nillionClient, nildbTokens } = useNillionClient();
 
   return useMutation({
+    ...options,
     mutationKey: ["deleteCollection"],
     mutationFn: async (collectionId: string) => {
       await nillionClient.deleteCollection(collectionId, {
@@ -19,6 +20,5 @@ export const useDeleteCollectionMutation = (
       await queryClient.invalidateQueries({ queryKey: ["builderProfile"] });
       await options?.onSuccess?.(data, variables, context, mutation);
     },
-    ...options,
   });
 };

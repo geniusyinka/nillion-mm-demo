@@ -1,32 +1,28 @@
 import type { UseMutationOptions } from "@tanstack/react-query";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useNillion } from "./useNillion";
 import { useNillionClient } from "./useNillionClient";
-import { usePersistedConnection } from "./usePersistedConnection";
 
 export const useDeleteBuilderMutation = (
   options?: Omit<UseMutationOptions<void, Error, void>, "mutationKey" | "mutationFn">,
 ) => {
-  const queryClient = useQueryClient();
   const { nillionClient } = useNillionClient();
-  const { state } = useNillion();
-  const { clearAll } = usePersistedConnection();
+  const { state, logout } = useNillion();
 
   return useMutation({
+    ...options,
     mutationKey: ["deleteBuilder"],
     mutationFn: async () => {
       if (!state.signer) {
         throw new Error("Signer not available");
       }
 
+      // don't override auth here to force a MM signature
       await nillionClient.deleteBuilder();
     },
     onSuccess: async (data, variables, context, mutation) => {
-      // Clear stored session data
-      clearAll();
-      queryClient.clear();
+      logout();
       await options?.onSuccess?.(data, variables, context, mutation);
     },
-    ...options,
   });
 };

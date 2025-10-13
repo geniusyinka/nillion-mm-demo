@@ -13,6 +13,7 @@ export const useRunQueryMutation = (
   const { log } = useLogContext();
 
   return useMutation<ByNodeName<Uuid>, Error, RunQueryRequest>({
+    ...options,
     mutationFn: async (body: RunQueryRequest) => {
       if (!hasCollection) {
         throw new Error("Collection not found. Please create one first.");
@@ -35,6 +36,5 @@ export const useRunQueryMutation = (
       log("✅ Query run started.", runIds);
       return runIds;
     },
-    ...options,
   });
 };

@@ -11,6 +11,7 @@ export const useCreateCollectionMutation = (
   const { nillionClient, nildbTokens } = useNillionClient();
 
   return useMutation({
+    ...options,
     mutationKey: ["createCollection"],
     mutationFn: async () => {
       const newId = crypto.randomUUID();
@@ -27,6 +28,5 @@ export const useCreateCollectionMutation = (
       await queryClient.invalidateQueries({ queryKey: ["builderProfile"] });
       await options?.onSuccess?.(data, variables, context, mutation);
     },
-    ...options,
   });
 };

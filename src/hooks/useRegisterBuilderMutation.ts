@@ -11,6 +11,7 @@ export const useRegisterBuilderMutation = (
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationKey: ["registerBuilder"],
     mutationFn: async () => {
       const did = await nillionClient.getId();
@@ -20,6 +21,5 @@ export const useRegisterBuilderMutation = (
       });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["builderProfile"] }),
-    ...options,
   });
 };
