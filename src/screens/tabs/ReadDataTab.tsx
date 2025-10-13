@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { Pagination } from "@/components/ui/Pagination";
 import { useFindDataQuery } from "@/hooks/useFindDataQuery";
 import { useProfile } from "@/hooks/useProfile";
 
@@ -14,40 +14,37 @@ export function ReadDataTab() {
   }
 
   const total = data?.pagination.total || 0;
-  const canGoNext = offset + limit < total;
-  const canGoPrev = offset > 0;
+  const currentPage = Math.floor(offset / limit) + 1;
+  const totalPages = Math.ceil(total / limit);
+
+  const handlePrevious = () => {
+    setOffset((prev) => Math.max(0, prev - limit));
+  };
+
+  const handleNext = () => {
+    if (offset + limit < total) {
+      setOffset((prev) => prev + limit);
+    }
+  };
 
   return (
-    <section className="flex flex-col gap-2">
+    <section className="flex flex-col h-full gap-2">
       <h3 className="m-0 text-base text-heading-secondary uppercase">Read Collection Data</h3>
-      <div className="border border-border p-2 bg-code-bg min-h-[200px] mt-2">
+      <div className="flex-grow border border-border p-4 bg-code-bg overflow-auto mt-2">
         {isLoading && <p>Loading data...</p>}
         {isError && <p className="text-red-500">Error: {error.message}</p>}
-        {data && (
-          <div>
-            <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(data.data, null, 2)}</pre>
-            <div className="flex justify-between items-center mt-2 text-sm">
-              <Button
-                onClick={() => setOffset((p) => Math.max(0, p - limit))}
-                disabled={!canGoPrev || isLoading}
-                className="w-auto px-3 py-1"
-              >
-                Previous
-              </Button>
-              <span>
-                {offset + 1} - {Math.min(offset + limit, total)} of {total}
-              </span>
-              <Button
-                onClick={() => setOffset((p) => p + limit)}
-                disabled={!canGoNext || isLoading}
-                className="w-auto px-3 py-1"
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        )}
+        {data && <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(data.data, null, 2)}</pre>}
       </div>
+      {data && (
+        <div className="border border-border rounded-md bg-code-bg">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPrevious={handlePrevious}
+            onNext={handleNext}
+          />
+        </div>
+      )}
     </section>
   );
 }

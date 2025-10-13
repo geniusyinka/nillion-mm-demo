@@ -17,6 +17,7 @@ export function Dashboard() {
   ];
 
   const [activeTab, setActiveTab] = useState(0);
+  const isReadDataTab = activeTab === 3;
 
   return (
     <div className="flex flex-col h-screen max-w-7xl mx-auto w-full">
@@ -26,20 +27,28 @@ export function Dashboard() {
 
       {/* Main content area */}
       <div className="flex flex-col flex-grow min-h-0 px-8 pb-8">
-        {/* Top Pane: Terminal Log */}
+        {/* Main Content: Terminal Log OR Active Tab Content */}
         <div className="flex-grow min-h-0">
-          <TerminalLog />
+          {isReadDataTab ? (
+            <div className="h-full flex flex-col">
+              <ReadDataTab />
+            </div>
+          ) : (
+            <TerminalLog />
+          )}
         </div>
 
-        {/* Bottom Pane: Controls */}
-        <div className="flex-shrink-0 mt-8 border border-border bg-panel-bg">
-          {/* Tab Content */}
-          <main className="p-4">{TABS[activeTab].content}</main>
-
-          {/* Tab Bar */}
-          <div className="bg-code-bg">
-            <Tabs tabs={TABS.map((t) => t.name)} activeTab={activeTab} setActiveTab={setActiveTab} />
+        {/* Bottom Pane: Controls (only show when not on Read Data tab) */}
+        {!isReadDataTab && (
+          <div className="flex-shrink-0 mt-8 border border-border bg-panel-bg">
+            {/* Tab Content */}
+            <main className="p-4">{TABS[activeTab].content}</main>
           </div>
+        )}
+
+        {/* Tab Bar (Footer) */}
+        <div className="flex-shrink-0 mt-8 border border-border bg-code-bg">
+          <Tabs tabs={TABS.map((t) => t.name)} activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
       </div>
     </div>
