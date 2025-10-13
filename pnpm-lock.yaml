@@ -15,8 +15,8 @@ importers:
         specifier: 1.0.0-rc.3
         version: 1.0.0-rc.3(pino@9.13.1)
       '@nillion/secretvaults':
-        specifier: file:/Users/tim/projects/NillionNetwork/secretvaults-ts
-        version: file:../secretvaults-ts
+        specifier: 1.0.0-rc.3
+        version: 1.0.0-rc.3
       '@tanstack/react-query':
         specifier: ^5.90.2
         version: 5.90.2(react@19.2.0)
@@ -370,8 +370,8 @@ packages:
     peerDependencies:
       pino: ^9.7.0
 
-  '@nillion/secretvaults@file:../secretvaults-ts':
-    resolution: {directory: ../secretvaults-ts, type: directory}
+  '@nillion/secretvaults@1.0.0-rc.3':
+    resolution: {integrity: sha512-HNFrTrRzwKIuCZhHZjicZVBF+vBgHS3DsRObPW/aveOHo35oO+7RTrOT0aZYbq/EJoDVesIS5N8SbO0EtppiDg==}
 
   '@noble/ciphers@1.3.0':
     resolution: {integrity: sha512-2I0gnIVPtfnMw9ee9h1dJG7tp81+8Ob3OJb3Mv37rx5L40/b0i7djjCVvGOVqc9AEIQyvyu1i6ypKdFw8R8gQw==}
@@ -2552,7 +2552,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@nillion/secretvaults@file:../secretvaults-ts':
+  '@nillion/secretvaults@1.0.0-rc.3':
     dependencies:
       '@nillion/blindfold': 0.1.0
       '@nillion/nuc': 1.0.0-rc.3(pino@9.13.1)

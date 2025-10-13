@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@nillion/nuc": "1.0.0-rc.3",
-    "@nillion/secretvaults": "file:/Users/tim/projects/NillionNetwork/secretvaults-ts",
+    "@nillion/secretvaults": "1.0.0-rc.3",
     "@tanstack/react-query": "^5.90.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
