@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
+import { AppFooter } from "@/components/layouts/AppFooter";
+import { AppHeader } from "@/components/layouts/AppHeader";
 import { TerminalLog } from "@/components/terminal/TerminalLog";
 import { Tabs } from "@/components/ui/Tabs";
+import { useCheckSubscriptionQuery } from "@/hooks/useCheckSubscriptionQuery";
+import { useNillion } from "@/hooks/useNillion";
+import { useProfile } from "@/hooks/useProfile";
 import { CollectionsTab } from "@/screens/tabs/CollectionsTab";
 import { CreateDataTab } from "@/screens/tabs/CreateDataTab";
 import { HomeTab } from "@/screens/tabs/HomeTab";
@@ -35,6 +40,24 @@ export function Dashboard() {
   const [activeTab, setActiveTab] = useState(getTabIndexFromUrl);
   const isHomeTab = activeTab === 0;
 
+  const { state: nillionState, logout } = useNillion();
+  const { isRegistered } = useProfile();
+  const { data: subscriptionData, isLoading: isSubscriptionLoading } = useCheckSubscriptionQuery();
+
+  // Determine subscription status: unknown, inactive, or active
+  const subscriptionStatus: "unknown" | "inactive" | "active" =
+    isSubscriptionLoading || !subscriptionData ? "unknown" : subscriptionData.subscribed ? "active" : "inactive";
+
+  // Determine registration status: unknown, inactive, or active
+  const registrationStatus: "unknown" | "inactive" | "active" = !nillionState.did
+    ? "unknown"
+    : isRegistered
+      ? "active"
+      : "inactive";
+
+  const did = nillionState.did || "";
+  const expiresAt = subscriptionData?.details?.expiresAt;
+
   const handleTabChange = (index: number) => {
     setActiveTab(index);
     updateUrlTab(TABS[index].id);
@@ -59,35 +82,38 @@ export function Dashboard() {
 
   return (
     <div className="flex flex-col h-screen max-w-7xl mx-auto w-full">
-      <header className="flex justify-between items-center py-6 px-8 flex-shrink-0">
-        <h1 className="text-2xl font-bold tracking-wider text-accent">nillion://secret_vault_dashboard</h1>
-      </header>
+      <AppHeader title="nillion://secret_vault_dashboard" />
 
-      <div className="flex flex-col flex-grow min-h-0 px-8 pb-8">
+      <div className="flex-shrink-0 px-8 pt-6">
+        <Tabs tabs={TABS.map((t) => t.name)} activeTab={activeTab} setActiveTab={handleTabChange} />
+      </div>
+
+      <div className="flex flex-col flex-grow min-h-0 px-8 pt-6 pb-8">
         {/* Conditional Layout: Log View for Home, Full-Screen for Others */}
         {isHomeTab ? (
           <>
             {/* Log View Layout */}
-            <div className="flex-grow min-h-0">
+            <div className="flex-grow min-h-0 mt-2">
               <TerminalLog />
             </div>
 
-            <div className="flex-shrink-0 mt-8 border border-border bg-panel-bg">
-              <main className="p-4">{TABS[activeTab].content}</main>
-            </div>
+            <div className="flex-shrink-0 mt-2 border border-border bg-panel-bg p-4">{TABS[activeTab].content}</div>
           </>
         ) : (
           <>
             {/* Full-Screen Content View Layout */}
-            <div className="flex-grow min-h-0">{TABS[activeTab].content}</div>
+            <div className="flex-grow min-h-0 mt-2">{TABS[activeTab].content}</div>
           </>
         )}
-
-        {/* Tab Bar (Footer) */}
-        <div className="flex-shrink-0 mt-8 border border-border bg-code-bg">
-          <Tabs tabs={TABS.map((t) => t.name)} activeTab={activeTab} setActiveTab={handleTabChange} />
-        </div>
       </div>
+
+      <AppFooter
+        did={did}
+        subscriptionStatus={subscriptionStatus}
+        registrationStatus={registrationStatus}
+        expiresAt={expiresAt}
+        onLogout={logout}
+      />
     </div>
   );
 }

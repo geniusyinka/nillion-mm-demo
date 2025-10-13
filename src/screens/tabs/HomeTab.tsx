@@ -19,7 +19,7 @@ export function HomeTab() {
       <div>
         <h3 className="m-0 mb-2 text-base text-heading-secondary uppercase">Builder Profile</h3>
         <div className="border border-border bg-code-bg text-sm">
-          <ProfileItem label="DID" value={state.did || "N/A"} />
+          <ProfileItem label="Id" value={state.did || "N/A"} />
           <ProfileItem label="Name" value={profile?.name || "N/A"} />
           <ProfileItem label="Collections" value={profile?.collections.length || 0} />
           <ProfileItem label="Queries" value={profile?.queries.length || 0} />

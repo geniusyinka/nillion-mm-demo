@@ -1,14 +1,18 @@
+import { AppFooter } from "@/components/layouts/AppFooter";
+import { AppHeader } from "@/components/layouts/AppHeader";
 import { TerminalLog } from "@/components/terminal/TerminalLog";
 import { Tabs } from "@/components/ui/Tabs";
 
 export function InitializationScreen() {
   return (
     <div className="flex flex-col h-screen max-w-7xl mx-auto w-full">
-      <header className="flex justify-between items-center py-6 px-8 flex-shrink-0">
-        <h1 className="text-2xl font-bold tracking-wider text-accent">nillion://secret_vault_initialization</h1>
-      </header>
+      <AppHeader title="nillion://secret_vault_initialization" />
 
-      <div className="flex flex-col flex-grow min-h-0 px-8 pb-8">
+      <div className="flex-shrink-0 px-8 pt-6">
+        <Tabs tabs={["🏠 Home"]} activeTab={0} setActiveTab={() => {}} disabled />
+      </div>
+
+      <div className="flex flex-col flex-grow min-h-0 px-8 pt-6 pb-8">
         {/* Main Content: Terminal Log */}
         <div className="flex-grow min-h-0">
           <TerminalLog />
@@ -20,12 +24,15 @@ export function InitializationScreen() {
             <p className="text-heading-secondary">Initializing...</p>
           </div>
         </div>
-
-        {/* Tab Bar (Footer) - Disabled */}
-        <div className="flex-shrink-0 mt-8 border border-border bg-code-bg">
-          <Tabs tabs={["🏠 Home"]} activeTab={0} setActiveTab={() => {}} disabled />
-        </div>
       </div>
+
+      <AppFooter
+        did=""
+        subscriptionStatus="unknown"
+        registrationStatus="unknown"
+        expiresAt={undefined}
+        onLogout={() => {}}
+      />
     </div>
   );
 }

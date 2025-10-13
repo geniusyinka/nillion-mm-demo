@@ -11,7 +11,7 @@ const LogContext = createContext<ILogContext | null>(null);
 const createLogEntry = (message: string) => `[${new Date().toLocaleTimeString("en-GB")}] ${message}`;
 
 export const LogProvider = ({ children }: { children: ReactNode }) => {
-  const [logs, setLogs] = useState<string[]>([createLogEntry("⚙️ Initializing...")]);
+  const [logs, setLogs] = useState<string[]>([]);
 
   const log = (message: string, data?: unknown) => {
     const entry = createLogEntry(message);

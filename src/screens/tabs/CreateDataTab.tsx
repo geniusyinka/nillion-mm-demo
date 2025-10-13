@@ -33,8 +33,7 @@ export function CreateDataTab() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col h-full gap-2">
-      <h3 className="m-0 text-base text-heading-secondary uppercase">Create Data</h3>
-      <div className="flex-grow border border-border p-4 bg-code-bg overflow-auto mt-2">
+      <div className="flex-grow border border-border p-4 bg-code-bg overflow-auto shadow-[0_0_20px_rgba(180,190,254,0.15)]">
         <div className="flex flex-col gap-4 max-w-2xl">
           <div className="flex flex-col gap-2">
             <label htmlFor={descriptionId} className="text-sm font-medium text-heading-secondary">

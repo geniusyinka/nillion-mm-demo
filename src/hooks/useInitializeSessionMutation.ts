@@ -16,7 +16,7 @@ async function initializeSession(
     throw new Error("Signer not available");
   }
 
-  log("⚙️ Initializing Nillion clients...");
+  log("⚙️ Initializing clients...");
   const payer = await PayerBuilder.fromKeplr(NETWORK_CONFIG.chainId).chainUrl(NETWORK_CONFIG.nilchain).build();
   const nilauthClient = await NilauthClient.create({ baseUrl: NETWORK_CONFIG.nilauth, payer });
 
