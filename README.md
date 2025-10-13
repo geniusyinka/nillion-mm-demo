@@ -1,1 +1,1 @@
-# React + TypeScript + Vite + NilDb + Nucs
+# NilDb + Nucs + SecretVaults + NilChain + NilPay + NilAuth + React + TypeScript + Vite

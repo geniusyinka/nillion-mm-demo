@@ -59,7 +59,7 @@ export function CollectionsTab() {
           disabled={isLoading || hasCollection}
           className="w-auto px-6"
         >
-          {hasCollection ? "Collection Created" : "Create Collection"}
+          Create Collection
         </Button>
         {hasCollection && (
           <Button
