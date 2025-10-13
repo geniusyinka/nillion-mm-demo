@@ -11,7 +11,7 @@ export const useReadCollectionQuery = (collectionId: string | null) => {
         auth: { invocations: nildbTokens },
       });
     },
-    enabled: false,
+    enabled: !!collectionId,
     retry: false,
   });
 };

@@ -63,25 +63,24 @@ export function Dashboard() {
         <h1 className="text-2xl font-bold tracking-wider text-accent">nillion://secret_vault_dashboard</h1>
       </header>
 
-      {/* Main content area */}
       <div className="flex flex-col flex-grow min-h-0 px-8 pb-8">
-        {/* Main Content: Terminal Log OR Active Tab Content */}
-        <div className="flex-grow min-h-0">
-          {isReadDataTab ? (
-            <div className="h-full flex flex-col">
-              <ReadDataTab />
+        {/* Conditional Layout: Log View for Home, Full-Screen for Others */}
+        {isHomeTab ? (
+          <>
+            {/* Log View Layout */}
+            <div className="flex-grow min-h-0">
+              <TerminalLog />
             </div>
-          ) : (
-            <TerminalLog />
-          )}
-        </div>
 
-        {/* Bottom Pane: Controls (only show when not on Read Data tab) */}
-        {!isReadDataTab && (
-          <div className="flex-shrink-0 mt-8 border border-border bg-panel-bg">
-            {/* Tab Content */}
-            <main className="p-4">{TABS[activeTab].content}</main>
-          </div>
+            <div className="flex-shrink-0 mt-8 border border-border bg-panel-bg">
+              <main className="p-4">{TABS[activeTab].content}</main>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Full-Screen Content View Layout */}
+            <div className="flex-grow min-h-0">{TABS[activeTab].content}</div>
+          </>
         )}
 
         {/* Tab Bar (Footer) */}

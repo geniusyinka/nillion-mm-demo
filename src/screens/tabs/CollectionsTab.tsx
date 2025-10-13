@@ -9,7 +9,11 @@ export function CollectionsTab() {
   const { log } = useLogContext();
   const { isRegistered, hasCollection, collectionId } = useProfile();
 
-  const { refetch: getCollection } = useReadCollectionQuery(collectionId);
+  const {
+    data: collectionMetadata,
+    isLoading: isLoadingMetadata,
+    error: metadataError,
+  } = useReadCollectionQuery(collectionId);
 
   const createCollectionMutation = useCreateCollectionMutation({
     onSuccess: (newId) => log("✅ Collection created.", { collectionId: newId }),
@@ -21,40 +25,44 @@ export function CollectionsTab() {
     onError: (err) => log("❌ Collection deletion failed.", err.message),
   });
 
-  const handleGetCollection = async () => {
-    log("Fetching collection...");
-    const result = await getCollection();
-    result.isError ? log("❌ Error", result.error.message) : log("✅ Success", result.data);
-  };
-
   const isLoading = createCollectionMutation.isPending || deleteCollectionMutation.isPending;
 
   if (!isRegistered) {
-    return <p className="text-heading-secondary">Register a builder in the 'Home' tab to manage collections.</p>;
+    return <p className="text-heading-secondary">Register a builder in the Home tab to manage collections.</p>;
   }
 
   return (
-    <section className="flex flex-col gap-2">
-      <h3 className="m-0 text-base text-heading-secondary uppercase">Collection Management</h3>
-
-      <Button onClick={() => createCollectionMutation.mutate()} disabled={isLoading || hasCollection} className="py-2">
-        {hasCollection ? "Collection Created" : "Create Collection"}
-      </Button>
-
-      {hasCollection && (
-        <>
-          <Button onClick={handleGetCollection} disabled={isLoading} className="py-2">
-            Read Collection Metadata
-          </Button>
+    <section className="flex flex-col h-full gap-2">
+      <h3 className="m-0 text-base text-heading-secondary uppercase">Collections</h3>
+      <div className="flex-grow border border-border p-4 bg-code-bg overflow-auto mt-2">
+        {!hasCollection ? (
+          <p className="text-heading-secondary">No collection exists. Create one to get started.</p>
+        ) : isLoadingMetadata ? (
+          <p>Loading collection metadata...</p>
+        ) : metadataError ? (
+          <p className="text-red-500">Error loading collection metadata: {metadataError.message}</p>
+        ) : collectionMetadata ? (
+          <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(collectionMetadata.data, null, 2)}</pre>
+        ) : null}
+      </div>
+      <div className="border border-border rounded-md bg-code-bg p-3 flex justify-end gap-3">
+        <Button
+          onClick={() => createCollectionMutation.mutate()}
+          disabled={isLoading || hasCollection}
+          className="w-auto px-6"
+        >
+          {hasCollection ? "Collection Created" : "Create Collection"}
+        </Button>
+        {hasCollection && (
           <Button
             onClick={() => collectionId && deleteCollectionMutation.mutate(collectionId)}
             disabled={isLoading}
-            className="py-2 bg-red-900/50 text-red-300 border-red-500/50 hover:bg-red-800/50 disabled:hover:bg-red-900/50"
+            className="w-auto px-6 bg-red-900/50 text-red-300 border-red-500/50 hover:bg-red-800/50 disabled:hover:bg-red-900/50"
           >
             Delete Collection
           </Button>
-        </>
-      )}
+        )}
+      </div>
     </section>
   );
 }
