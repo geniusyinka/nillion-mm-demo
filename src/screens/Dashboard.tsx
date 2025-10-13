@@ -93,16 +93,20 @@ export function Dashboard() {
         {isHomeTab ? (
           <>
             {/* Log View Layout */}
-            <div className="flex-grow min-h-0 mt-2">
+            <div className="flex-grow min-h-0 mt-2 animate-in fade-in duration-300">
               <TerminalLog />
             </div>
 
-            <div className="flex-shrink-0 mt-2 border border-border bg-panel-bg p-4">{TABS[activeTab].content}</div>
+            <div className="flex-shrink-0 mt-2 border border-border bg-panel-bg p-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              {TABS[activeTab].content}
+            </div>
           </>
         ) : (
           <>
             {/* Full-Screen Content View Layout */}
-            <div className="flex-grow min-h-0 mt-2">{TABS[activeTab].content}</div>
+            <div className="flex-grow min-h-0 mt-2 animate-in fade-in slide-in-from-right-4 duration-300">
+              {TABS[activeTab].content}
+            </div>
           </>
         )}
       </div>

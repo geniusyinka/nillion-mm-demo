@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Loading } from "@/components/ui/Loading";
 import { Pagination } from "@/components/ui/Pagination";
 import { useFindDataQuery } from "@/hooks/useFindDataQuery";
+import { useMinimumLoadingTime } from "@/hooks/useMinimumLoadingTime";
 import { useProfile } from "@/hooks/useProfile";
 
 export function ReadDataTab() {
@@ -8,6 +10,7 @@ export function ReadDataTab() {
   const [offset, setOffset] = useState(0);
   const limit = 5;
   const { data, isLoading, isError, error } = useFindDataQuery(offset, limit);
+  const showLoading = useMinimumLoadingTime(isLoading, 500);
 
   if (!hasCollection) {
     return <p className="text-heading-secondary">Create a collection in the 'Collections' tab to manage data.</p>;
@@ -30,9 +33,13 @@ export function ReadDataTab() {
   return (
     <section className="flex flex-col h-full gap-2">
       <div className="flex-grow border border-border p-4 bg-code-bg overflow-auto shadow-[0_0_20px_rgba(180,190,254,0.15)]">
-        {isLoading && <p>Loading data...</p>}
-        {isError && <p className="text-red-500">Error: {error.message}</p>}
-        {data && <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(data.data, null, 2)}</pre>}
+        {showLoading && <Loading message="Loading data..." />}
+        {!showLoading && isError && <p className="text-red-500">Error: {error.message}</p>}
+        {!showLoading && data && (
+          <pre className="text-xs whitespace-pre-wrap animate-in fade-in duration-300">
+            {JSON.stringify(data.data, null, 2)}
+          </pre>
+        )}
       </div>
       {data && (
         <div className="border border-border rounded-md bg-code-bg">

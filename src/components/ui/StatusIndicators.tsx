@@ -1,3 +1,5 @@
+import { Tooltip } from "@/components/ui/Tooltip";
+
 interface StatusIndicatorsProps {
   subscriptionStatus: "unknown" | "inactive" | "active";
   registrationStatus: "unknown" | "inactive" | "active";
@@ -33,11 +35,11 @@ const formatDate = (timestamp: number) => {
 const getStatusColor = (status: "unknown" | "inactive" | "active") => {
   switch (status) {
     case "active":
-      return "bg-green-500";
+      return "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse";
     case "inactive":
       return "bg-red-500";
     case "unknown":
-      return "bg-warning";
+      return "bg-warning shadow-[0_0_8px_rgba(234,179,8,0.6)] animate-pulse";
   }
 };
 
@@ -63,23 +65,28 @@ export function StatusIndicators({
 
   return (
     <div className="flex items-center gap-3 font-mono">
-      <span className="flex items-center gap-1.5" title={subscriptionTooltip}>
-        <span className="text-foreground/60">S</span>
-        <span className={`w-2 h-2 rounded-full ${getStatusColor(subscriptionStatus)}`} />
-      </span>
+      <Tooltip content={subscriptionTooltip}>
+        <span className="flex items-center gap-1.5">
+          <span className="text-foreground/60">S</span>
+          <span className={`w-2 h-2 rounded-full ${getStatusColor(subscriptionStatus)}`} />
+        </span>
+      </Tooltip>
       <span className="text-border">|</span>
-      <span className="flex items-center gap-1.5" title={registrationTooltip}>
-        <span className="text-foreground/60">R</span>
-        <span className={`w-2 h-2 rounded-full ${getStatusColor(registrationStatus)}`} />
-      </span>
-      <button
-        onClick={onLogout}
-        type="button"
-        className="font-mono text-red-400 hover:text-red-200 pl-2"
-        title="Logout"
-      >
-        [X]
-      </button>
+      <Tooltip content={registrationTooltip}>
+        <span className="flex items-center gap-1.5">
+          <span className="text-foreground/60">R</span>
+          <span className={`w-2 h-2 rounded-full ${getStatusColor(registrationStatus)}`} />
+        </span>
+      </Tooltip>
+      <Tooltip content="Logout">
+        <button
+          onClick={onLogout}
+          type="button"
+          className="font-mono text-red-400 hover:text-red-200 hover:scale-110 active:scale-95 pl-2 transition-all duration-150 cursor-pointer"
+        >
+          [X]
+        </button>
+      </Tooltip>
     </div>
   );
 }

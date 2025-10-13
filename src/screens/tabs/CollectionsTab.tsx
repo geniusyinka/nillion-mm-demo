@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/Button";
+import { Loading } from "@/components/ui/Loading";
 import { useLogContext } from "@/context/LogContext";
 import { useCreateCollectionMutation } from "@/hooks/useCreateCollectionMutation";
 import { useDeleteCollectionMutation } from "@/hooks/useDeleteCollectionMutation";
+import { useMinimumLoadingTime } from "@/hooks/useMinimumLoadingTime";
 import { useProfile } from "@/hooks/useProfile";
 import { useReadCollectionQuery } from "@/hooks/useReadCollectionQuery";
 
@@ -14,6 +16,8 @@ export function CollectionsTab() {
     isLoading: isLoadingMetadata,
     error: metadataError,
   } = useReadCollectionQuery(collectionId);
+
+  const showLoading = useMinimumLoadingTime(isLoadingMetadata, 500);
 
   const createCollectionMutation = useCreateCollectionMutation({
     onSuccess: (newId) => log("✅ Collection created.", { collectionId: newId }),
@@ -36,12 +40,14 @@ export function CollectionsTab() {
       <div className="flex-grow border border-border p-4 bg-code-bg overflow-auto shadow-[0_0_20px_rgba(180,190,254,0.15)]">
         {!hasCollection ? (
           <p className="text-heading-secondary">No collection exists. Create one to get started.</p>
-        ) : isLoadingMetadata ? (
-          <p>Loading collection metadata...</p>
+        ) : showLoading ? (
+          <Loading message="Loading collection metadata..." />
         ) : metadataError ? (
           <p className="text-red-500">Error loading collection metadata: {metadataError.message}</p>
         ) : collectionMetadata ? (
-          <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(collectionMetadata.data, null, 2)}</pre>
+          <pre className="text-xs whitespace-pre-wrap animate-in fade-in duration-300">
+            {JSON.stringify(collectionMetadata.data, null, 2)}
+          </pre>
         ) : null}
       </div>
       <div className="border border-border rounded-md bg-code-bg p-3 flex justify-end gap-3">
