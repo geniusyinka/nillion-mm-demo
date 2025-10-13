@@ -1,5 +1,4 @@
 import { StatusIndicators } from "@/components/ui/StatusIndicators";
-import { truncateDid } from "@/utils/text";
 
 interface AppFooterProps {
   did: string;
@@ -13,7 +12,7 @@ export function AppFooter({ did, subscriptionStatus, registrationStatus, expires
   return (
     <footer className="flex justify-between items-center bg-zinc-900 border-t border-border text-sm p-3 flex-shrink-0">
       <div className="flex items-center gap-4 text-foreground/80">
-        <span>{did ? `🔑 ${truncateDid(did, 12, 4)}` : ""}</span>
+        <span>{did ? `🔑 ${did}` : ""}</span>
       </div>
       <StatusIndicators
         subscriptionStatus={subscriptionStatus}
