@@ -7,7 +7,7 @@ interface TabsProps {
 
 export function Tabs({ tabs, activeTab, setActiveTab, disabled = false }: TabsProps) {
   return (
-    <div className="flex border-b border-border">
+    <div className="flex">
       {tabs.map((tab, index) => (
         <button
           key={tab}
