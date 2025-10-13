@@ -16,12 +16,11 @@ export function TerminalLog() {
     <section className="border border-border p-0 h-full max-h-full flex flex-col bg-code-bg shadow-[0_0_20px_rgba(180,190,254,0.15)] transition-all duration-300">
       <pre
         ref={logContainerRef}
-        className="p-3 flex-grow overflow-y-auto whitespace-pre-wrap break-all text-sm font-mono animate-in fade-in duration-500"
-        style={{ lineHeight: "1.2" }}
+        className="p-4 flex-grow overflow-y-auto whitespace-pre-wrap break-all text-[13px] font-mono animate-in fade-in duration-500 tracking-wide leading-relaxed"
       >
         {logs.join("\n")}
         {"\n> "}
-        <span className="animate-pulse">█</span>
+        <span className="animate-pulse text-accent">█</span>
       </pre>
     </section>
   );

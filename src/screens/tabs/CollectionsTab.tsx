@@ -45,7 +45,10 @@ export function CollectionsTab() {
         ) : metadataError ? (
           <p className="text-red-500">Error loading collection metadata: {metadataError.message}</p>
         ) : collectionMetadata ? (
-          <pre className="text-xs whitespace-pre-wrap animate-in fade-in duration-300">
+          <pre
+            className="text-[13px] whitespace-pre-wrap animate-in fade-in duration-300 font-mono tracking-wide leading-relaxed"
+            style={{ fontVariantLigatures: "none", fontFeatureSettings: '"calt" 0' }}
+          >
             {JSON.stringify(collectionMetadata.data, null, 2)}
           </pre>
         ) : null}

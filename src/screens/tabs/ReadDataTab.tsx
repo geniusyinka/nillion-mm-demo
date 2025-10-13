@@ -36,7 +36,10 @@ export function ReadDataTab() {
         {showLoading && <Loading message="Loading data..." />}
         {!showLoading && isError && <p className="text-red-500">Error: {error.message}</p>}
         {!showLoading && data && (
-          <pre className="text-xs whitespace-pre-wrap animate-in fade-in duration-300">
+          <pre
+            className="text-[13px] whitespace-pre-wrap animate-in fade-in duration-300 font-mono tracking-wide leading-relaxed"
+            style={{ fontVariantLigatures: "none", fontFeatureSettings: '"calt" 0' }}
+          >
             {JSON.stringify(data.data, null, 2)}
           </pre>
         )}
