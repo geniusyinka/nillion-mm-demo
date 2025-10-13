@@ -62,6 +62,20 @@ async function initializeSession(
   }
   log("✅ All node tokens minted.");
 
+  log("🔍 Checking for existing builder profile...");
+  try {
+    await nillionClient.readProfile({ auth: { invocations: nildbTokens } });
+    log("✅ Builder profile found.");
+  } catch (_error) {
+    // If readProfile fails the builder isn't registered
+    log("ℹ️ No profile found, registering new builder...");
+    await nillionClient.register({
+      did: subscriberDid.didString,
+      name: "Demo Builder",
+    });
+    log("✅ Builder registered successfully.");
+  }
+
   return { nillionClient, nilauthClient, rootToken, nildbTokens };
 }
 
