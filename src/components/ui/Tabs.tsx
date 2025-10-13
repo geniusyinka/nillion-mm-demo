@@ -1,9 +1,8 @@
-import type { Dispatch, SetStateAction } from "react";
-
 interface TabsProps {
   tabs: string[];
   activeTab: number;
-  setActiveTab: Dispatch<SetStateAction<number>>;
+  setActiveTab: (index: number) => void;
+  disabled?: boolean;
 }
 
 export function Tabs({ tabs, activeTab, setActiveTab }: TabsProps) {
