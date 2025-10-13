@@ -30,6 +30,8 @@ export function ReadDataTab() {
     }
   };
 
+  console.log(data);
+
   return (
     <section className="flex flex-col h-full gap-2">
       <div className="flex-grow border border-border p-4 bg-code-bg overflow-auto shadow-[0_0_20px_rgba(180,190,254,0.15)]">
