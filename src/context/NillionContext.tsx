@@ -4,6 +4,7 @@ import { createContext, type ReactNode, useCallback, useEffect, useMemo, useRef,
 import { createWalletClient, custom, type TypedDataDomain } from "viem";
 import { mainnet } from "viem/chains";
 import { NETWORK_CONFIG } from "@/config";
+import { AuthFlowManager } from "@/context/AuthFlowManager";
 import { useLogContext } from "@/context/LogContext";
 import { usePersistedConnection } from "@/hooks/usePersistedConnection";
 import type { NillionState } from "./NillionState";
@@ -137,7 +138,7 @@ export function NillionProvider({ children }: { children: ReactNode }) {
     hasConnected.metaMask,
     state.wallets.isKeplrConnected,
     state.wallets.isMetaMaskConnected,
-  ]); // Only run on mount
+  ]);
 
   const contextValue = useMemo(
     () => ({
@@ -149,5 +150,10 @@ export function NillionProvider({ children }: { children: ReactNode }) {
     [state, connectMetaMask, connectKeplr, logout],
   );
 
-  return <NillionContext.Provider value={contextValue}>{children}</NillionContext.Provider>;
+  return (
+    <NillionContext.Provider value={contextValue}>
+      <AuthFlowManager />
+      {children}
+    </NillionContext.Provider>
+  );
 }
