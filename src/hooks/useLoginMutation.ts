@@ -1,4 +1,4 @@
-import { Codec, NilauthClient, PayerBuilder } from "@nillion/nuc";
+import { Codec, NilauthClient } from "@nillion/nuc";
 import { SecretVaultBuilderClient } from "@nillion/secretvaults";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { NETWORK_CONFIG } from "@/config";
@@ -26,8 +26,11 @@ async function login(
   }
 
   log("📦 Found stored session, re-hydrating clients...");
-  const payer = await PayerBuilder.fromKeplr(NETWORK_CONFIG.chainId).chainUrl(NETWORK_CONFIG.nilchain).build();
-  const nilauthClient = await NilauthClient.create({ baseUrl: NETWORK_CONFIG.nilauth, payer });
+  // Create NilauthClient without payer for subscription checks only
+  const nilauthClient = await NilauthClient.create({ 
+    baseUrl: NETWORK_CONFIG.nilauth, 
+    payer: undefined 
+  });
 
   const nillionClient = await SecretVaultBuilderClient.from({
     signer,
@@ -41,6 +44,45 @@ async function login(
   const rootToken = Codec.decodeBase64Url(storedRootToken);
   const nildbTokens = storedNildbTokens;
 
+  // Check if builder is registered, register if not
+  log("🔍 Checking for existing builder profile...");
+  let profileExists = false;
+  try {
+    await nillionClient.readProfile({ auth: { invocations: nildbTokens } });
+    log("✅ Builder profile found.");
+    profileExists = true;
+  } catch (profileError) {
+    // If readProfile fails the builder might not be registered
+    log("ℹ️ No profile found, attempting to register builder...");
+    try {
+      const subscriberDid = await signer.getDid();
+      await nillionClient.register({
+        did: subscriberDid.didString,
+        name: "Demo Builder",
+      });
+      log("✅ Builder registered successfully.");
+      profileExists = true;
+    } catch (registerError: any) {
+      // If registration fails with duplicate error, builder already exists (that's fine)
+      const errorMessage = registerError?.message || String(registerError);
+      const errorString = JSON.stringify(registerError);
+      const errorsArray = registerError?.errors || [];
+      const hasDuplicateError =
+        errorMessage.includes("DuplicateEntryError") ||
+        errorMessage.includes("duplicate") ||
+        errorString.includes("DuplicateEntryError") ||
+        errorsArray.some((e: any) => String(e).includes("DuplicateEntryError"));
+      
+      if (hasDuplicateError) {
+        log("ℹ️ Builder already registered (duplicate entry) - continuing.");
+        profileExists = true; // If duplicate, it means it's already registered
+      } else {
+        // Re-throw if it's a different error
+        throw registerError;
+      }
+    }
+  }
+
   return { nillionClient, nilauthClient, rootToken, nildbTokens };
 }
 
@@ -52,11 +94,11 @@ export const useLoginMutation = () => {
 
   return useMutation({
     mutationFn: () => login(state.signer, log, getStoredRootToken, getStoredNildbTokens),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       log("✅ Session re-established.");
       queryClient.setQueryData(["session"], data);
-      queryClient.invalidateQueries({ queryKey: ["subscriptionStatus"] });
-      queryClient.invalidateQueries({ queryKey: ["builderProfile"] });
+      await queryClient.invalidateQueries({ queryKey: ["subscriptionStatus"] });
+      await queryClient.invalidateQueries({ queryKey: ["builderProfile"] });
     },
     onError: (error) => {
       if (isUserRejection(error)) {

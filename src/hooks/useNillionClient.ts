@@ -6,11 +6,11 @@ interface NillionClientHook {
   nildbTokens: Record<string, string>;
 }
 
-export function useNillionClient(): NillionClientHook {
+export function useNillionClient(): NillionClientHook | null {
   const { data: session, isSuccess } = useSessionQuery();
 
   if (!isSuccess || !session?.nillionClient || !session?.nildbTokens) {
-    throw new Error("Nillion client and tokens are not available.");
+    return null;
   }
 
   return {

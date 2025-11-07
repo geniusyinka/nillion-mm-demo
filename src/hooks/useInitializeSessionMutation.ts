@@ -1,11 +1,11 @@
-import { Builder, Codec, type Command, NilauthClient, PayerBuilder } from "@nillion/nuc";
+import { Builder, Codec, type Command, NilauthClient } from "@nillion/nuc";
 import { NucCmd, SecretVaultBuilderClient } from "@nillion/secretvaults";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { NETWORK_CONFIG } from "@/config";
 import { useLogContext } from "@/context/LogContext";
 import { useNillion } from "@/hooks/useNillion";
 import { usePersistedConnection } from "@/hooks/usePersistedConnection";
-import { isUserRejection } from "@/utils/errors";
+import { isUserRejection, isCorsError, isNetworkError, formatErrorForLogging } from "@/utils/errors";
 import type { Session } from "./useSessionQuery";
 
 async function initializeSession(
@@ -17,28 +17,63 @@ async function initializeSession(
   }
 
   log("⚙️ Initializing clients...");
-  const payer = await PayerBuilder.fromKeplr(NETWORK_CONFIG.chainId).chainUrl(NETWORK_CONFIG.nilchain).build();
-  const nilauthClient = await NilauthClient.create({ baseUrl: NETWORK_CONFIG.nilauth, payer });
+  console.log("🔧 Network config:", {
+    chainId: NETWORK_CONFIG.chainId,
+    nilchain: NETWORK_CONFIG.nilchain,
+    nilauth: NETWORK_CONFIG.nilauth,
+    nildb: NETWORK_CONFIG.nildb,
+  });
+
+  let nilauthClient;
+  
+  try {
+    // Create NilauthClient without payer for subscription checks only
+    nilauthClient = await NilauthClient.create({ 
+      baseUrl: NETWORK_CONFIG.nilauth, 
+      payer: undefined 
+    });
+    log("✅ Nilauth client created");
+    console.log("✅ Nilauth client base URL:", NETWORK_CONFIG.nilauth);
+  } catch (error) {
+    const formattedError = formatErrorForLogging(error);
+    console.error("❌ Error creating clients:", formattedError);
+    if (isCorsError(error)) {
+      log("🚫 CORS Error: Testnet endpoint may not support CORS for browser requests.");
+    }
+    if (isNetworkError(error)) {
+      log("🌐 Network Error: Check endpoint connectivity.");
+    }
+    throw error;
+  }
 
   const subscriberDid = await signer.getDid();
-  log("🔍 Checking subscription status...");
-  const subStatus = await nilauthClient.subscriptionStatus(subscriberDid, "nildb");
+  log("🔍 Checking subscription status for builder account...");
+  console.log("🔍 Builder DID:", subscriberDid.didString);
+  
+  let subStatus;
+  try {
+    subStatus = await nilauthClient.subscriptionStatus(subscriberDid, "nildb");
+    console.log("📊 Subscription status:", subStatus);
+  } catch (error) {
+    const formattedError = formatErrorForLogging(error);
+    console.error("❌ Subscription check error:", formattedError);
+    if (isCorsError(error)) {
+      log("🚫 CORS Error during subscription check. Testnet endpoint may not support CORS.");
+    }
+    if (isNetworkError(error)) {
+      log("🌐 Network Error during subscription check.");
+    }
+    throw error;
+  }
 
   if (!subStatus.subscribed) {
-    log("ℹ️ No active subscription found. Starting payment flow...");
-    const cost = await nilauthClient.subscriptionCost("nildb");
-    log(`💰 Subscription cost: ${cost} unil`);
-    const payerDid = await signer.getDid();
-    const { resourceHash, payload } = nilauthClient.createPaymentResource(subscriberDid, "nildb", payerDid);
-    log("⏳ Waiting for Keplr payment approval...");
-    const txHash = await payer.pay(resourceHash, cost);
-    log(`✅ Payment successful! Tx: ${txHash.slice(0, 10)}...`);
-    log("⏳ Waiting for MetaMask signature to validate payment...");
-    await nilauthClient.validatePayment(txHash, payload, signer);
-    log("✅ Payment validated.");
-  } else {
-    log("✅ Active subscription found.");
+    const errorMsg = "No active NilDB subscription found for this builder account. Please ensure your builder account has an active subscription.";
+    log("❌ " + errorMsg);
+    throw new Error(errorMsg);
   }
+  
+  log("✅ Active subscription found for builder account.");
+
 
   const nillionClient = await SecretVaultBuilderClient.from({
     signer,
@@ -67,13 +102,33 @@ async function initializeSession(
     await nillionClient.readProfile({ auth: { invocations: nildbTokens } });
     log("✅ Builder profile found.");
   } catch (_error) {
-    // If readProfile fails the builder isn't registered
-    log("ℹ️ No profile found, registering new builder...");
-    await nillionClient.register({
-      did: subscriberDid.didString,
-      name: "Demo Builder",
-    });
-    log("✅ Builder registered successfully.");
+    // If readProfile fails the builder might not be registered
+    log("ℹ️ No profile found, attempting to register builder...");
+    try {
+      const subscriberDid = await signer.getDid();
+      await nillionClient.register({
+        did: subscriberDid.didString,
+        name: "Demo Builder",
+      });
+      log("✅ Builder registered successfully.");
+    } catch (registerError: any) {
+      // If registration fails with duplicate error, builder already exists (that's fine)
+      const errorMessage = registerError?.message || String(registerError);
+      const errorString = JSON.stringify(registerError);
+      const errorsArray = registerError?.errors || [];
+      const hasDuplicateError =
+        errorMessage.includes("DuplicateEntryError") ||
+        errorMessage.includes("duplicate") ||
+        errorString.includes("DuplicateEntryError") ||
+        errorsArray.some((e: any) => String(e).includes("DuplicateEntryError"));
+      
+      if (hasDuplicateError) {
+        log("ℹ️ Builder already registered (duplicate entry) - continuing.");
+      } else {
+        // Re-throw if it's a different error
+        throw registerError;
+      }
+    }
   }
 
   return { nillionClient, nilauthClient, rootToken, nildbTokens };
@@ -96,10 +151,20 @@ export const useInitializeSessionMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["builderProfile"] });
     },
     onError: (error) => {
+      const formattedError = formatErrorForLogging(error);
+      console.error("❌ Session initialization error:", formattedError);
+      
       if (isUserRejection(error)) {
         log("❌ Process cancelled by user.");
+      } else if (isCorsError(error)) {
+        log("🚫 CORS Error: Testnet endpoints may not support CORS. Check browser console for details.");
+        console.error("CORS Error Details:", formattedError);
+      } else if (isNetworkError(error)) {
+        log("🌐 Network Error: Check your connection and endpoint availability.");
+        console.error("Network Error Details:", formattedError);
       } else {
         log("❌ Session initialization failed", error instanceof Error ? error.message : String(error));
+        console.error("Full Error:", formattedError);
       }
     },
   });

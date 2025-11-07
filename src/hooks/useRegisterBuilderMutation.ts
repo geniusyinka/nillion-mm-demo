@@ -7,13 +7,17 @@ type RegisterBuilderResult = Awaited<ReturnType<SecretVaultBuilderClient["regist
 export const useRegisterBuilderMutation = (
   options?: Omit<UseMutationOptions<RegisterBuilderResult, Error, void>, "mutationKey" | "mutationFn">,
 ) => {
-  const { nillionClient } = useNillionClient();
+  const clientData = useNillionClient();
   const queryClient = useQueryClient();
 
   return useMutation({
     ...options,
     mutationKey: ["registerBuilder"],
     mutationFn: async () => {
+      if (!clientData) {
+        throw new Error("Nillion client not initialized");
+      }
+      const { nillionClient } = clientData;
       const did = await nillionClient.getId();
       return await nillionClient.register({
         did,

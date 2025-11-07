@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { useNillion } from "@/hooks/useNillion";
+import { useState } from "react";
 
 function Step({
   label,
@@ -41,28 +42,35 @@ function Step({
 }
 
 export function LoginScreen() {
-  const { state, connectMetaMask, connectKeplr } = useNillion();
+  const { state, connectMetaMask } = useNillion();
   const { wallets } = state;
+  const [mmLoading, setMmLoading] = useState(false);
+
+  const onConnectMM = async () => {
+    if (wallets.isMetaMaskConnected || mmLoading) return;
+    setMmLoading(true);
+    try {
+      await connectMetaMask();
+    } finally {
+      setMmLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <div className="w-full max-w-lg p-8 border border-border bg-panel-bg shadow-[0_0_20px_rgba(180,190,254,0.1)]">
-        <h1 className="text-2xl font-bold tracking-wider text-center mb-6 text-accent">nillion://secret_vault_login</h1>
+        <h1 className="text-2xl font-bold tracking-wider text-center mb-6 text-accent">nillion://passwordless_notes</h1>
+        <p className="text-sm text-center mb-6 text-heading-secondary">
+          Connect your MetaMask wallet to access your secure notes.
+        </p>
         <table className="w-full border-collapse table-fixed">
           <tbody>
             <Step
-              label="Identity Wallet"
-              status={wallets.isMetaMaskConnected ? "done" : "pending"}
-              action={connectMetaMask}
-              actionLabel="Connect"
+              label="MetaMask Wallet"
+              status={wallets.isMetaMaskConnected ? "done" : mmLoading ? "loading" : "pending"}
+              action={onConnectMM}
+              actionLabel="Connect MetaMask"
               content={state.did || ""}
-            />
-            <Step
-              label="Payment Wallet"
-              status={wallets.isKeplrConnected ? "done" : "pending"}
-              action={connectKeplr}
-              actionLabel="Connect"
-              content={wallets.keplrAddress || ""}
             />
           </tbody>
         </table>

@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 
 const META_MASK_KEY = "nillion_hasConnectedMetaMask";
-const KEPLR_KEY = "nillion_hasConnectedKeplr";
 const ROOT_TOKEN_KEY = "nillion_rootToken";
 const NILDB_TOKENS_KEY = "nillion_nildbTokens";
 
@@ -10,10 +9,9 @@ export function usePersistedConnection() {
     try {
       return {
         metaMask: localStorage.getItem(META_MASK_KEY) === "true",
-        keplr: localStorage.getItem(KEPLR_KEY) === "true",
       };
     } catch {
-      return { metaMask: false, keplr: false };
+      return { metaMask: false };
     }
   });
 
@@ -21,15 +19,6 @@ export function usePersistedConnection() {
     try {
       localStorage.setItem(META_MASK_KEY, "true");
       setHasConnected((prev) => ({ ...prev, metaMask: true }));
-    } catch (e) {
-      console.error("Failed to write to localStorage", e);
-    }
-  }, []);
-
-  const setKeplrConnected = useCallback(() => {
-    try {
-      localStorage.setItem(KEPLR_KEY, "true");
-      setHasConnected((prev) => ({ ...prev, keplr: true }));
     } catch (e) {
       console.error("Failed to write to localStorage", e);
     }
@@ -71,10 +60,9 @@ export function usePersistedConnection() {
   const clearAll = useCallback(() => {
     try {
       localStorage.removeItem(META_MASK_KEY);
-      localStorage.removeItem(KEPLR_KEY);
       localStorage.removeItem(ROOT_TOKEN_KEY);
       localStorage.removeItem(NILDB_TOKENS_KEY);
-      setHasConnected({ metaMask: false, keplr: false });
+      setHasConnected({ metaMask: false });
     } catch (e) {
       console.error("Failed to clear localStorage", e);
     }
@@ -85,7 +73,6 @@ export function usePersistedConnection() {
   return {
     hasConnected,
     setMetaMaskConnected,
-    setKeplrConnected,
     getStoredRootToken,
     setStoredRootToken,
     getStoredNildbTokens,

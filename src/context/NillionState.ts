@@ -5,7 +5,6 @@ export interface NillionState {
   did: string | null;
   wallets: {
     isMetaMaskConnected: boolean;
-    isKeplrConnected: boolean;
-    keplrAddress: string | null;
+    metaMaskAddress: string | null;
   };
 }

@@ -1,12 +1,12 @@
-import { MainLayout } from "./components/layouts/MainLayout";
 import { LogProvider } from "./context/LogContext";
 import { NillionProvider } from "./context/NillionContext";
+import { NotesScreen } from "./screens/NotesScreen";
 
 function App() {
   return (
     <LogProvider>
       <NillionProvider>
-        <MainLayout />
+        <NotesScreen />
       </NillionProvider>
     </LogProvider>
   );

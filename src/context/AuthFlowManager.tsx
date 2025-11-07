@@ -20,10 +20,10 @@ export function AuthFlowManager() {
     }
   }, [state.did]);
 
-  // Trigger authentication flow when both wallets are connected
+  // Trigger authentication flow when MetaMask is connected
   useEffect(() => {
-    const walletsConnected = state.did && state.wallets.isKeplrConnected;
-    if (walletsConnected && !isSessionReady && !authFlowTriggeredRef.current) {
+    const isMetaMaskConnected = state.did && state.wallets.isMetaMaskConnected;
+    if (isMetaMaskConnected && !isSessionReady && !authFlowTriggeredRef.current) {
       authFlowTriggeredRef.current = true;
       if (hasStoredSession) {
         login();
@@ -31,7 +31,7 @@ export function AuthFlowManager() {
         initialize();
       }
     }
-  }, [state.did, state.wallets.isKeplrConnected, isSessionReady, hasStoredSession, login, initialize]);
+  }, [state.did, state.wallets.isMetaMaskConnected, isSessionReady, hasStoredSession, login, initialize]);
 
   // This component only manages side effects, it doesn't render anything
   return null;

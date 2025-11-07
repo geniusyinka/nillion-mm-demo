@@ -7,12 +7,12 @@ export const useBuilderProfileQuery = () => {
 
   return useQuery({
     queryKey: ["builderProfile"],
-    queryFn: () => {
+    queryFn: async () => {
       if (!session?.nillionClient || !session?.nildbTokens) {
         throw new Error("Session not ready");
       }
       const nillionClient = session.nillionClient as SecretVaultBuilderClient;
-      return nillionClient.readProfile({
+      return await nillionClient.readProfile({
         auth: { invocations: session.nildbTokens },
       });
     },

@@ -1,7 +1,7 @@
 import { useBuilderProfileQuery } from "./useBuilderProfileQuery";
 
 export function useProfile() {
-  const { data: profileData, ...query } = useBuilderProfileQuery();
+  const { data: profileData, isLoading, isError, error, ...query } = useBuilderProfileQuery();
 
   const profile = profileData?.data || null;
   const isRegistered = !!profile;
@@ -15,6 +15,9 @@ export function useProfile() {
     collections,
     hasCollection,
     collectionId,
+    isLoading,
+    isError,
+    error,
     ...query,
   };
 }
